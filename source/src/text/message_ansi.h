@@ -10,7 +10,7 @@
     "ROM Buffer %2dMB",
 
     // MSG_BROWSER_HELP
-    "¡ð:Select  ¡Á:Menu  ¡õ:" FONT_UP_DIRECTORY_GBK,
+    "ï¿½ï¿½:Select  ï¿½ï¿½:Menu  ï¿½ï¿½:" FONT_UP_DIRECTORY_GBK,
 
     // MSG_MENU_DATE_FMT_0
     "%4d/%2d/%2d %-3s %2d:%02d",
@@ -61,43 +61,43 @@
     "Exit TempGBA",
 
     // MSG_MAIN_MENU_HELP_0
-    "¡ð:Load  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select slot",
+    "ï¿½ï¿½:Load  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select slot",
 
     // MSG_MAIN_MENU_HELP_1
-    "¡ð:Save  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select slot",
+    "ï¿½ï¿½:Save  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select slot",
 
     // MSG_MAIN_MENU_HELP_2
-    "¡ð:Sub menu  " FONT_R_TRIGGER_GBK ":Shortcut key",
+    "ï¿½ï¿½:Sub menu  " FONT_R_TRIGGER_GBK ":Shortcut key",
 
     // MSG_MAIN_MENU_HELP_3
-    "¡ð:Save Image  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select image format",
+    "ï¿½ï¿½:Save Image  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select image format",
 
     // MSG_MAIN_MENU_HELP_4
-    "¡ð:Sub menu",
+    "ï¿½ï¿½:Sub menu",
 
     // MSG_MAIN_MENU_HELP_5
-    "¡ð:Sub menu",
+    "ï¿½ï¿½:Sub menu",
 
     // MSG_MAIN_MENU_HELP_6
-    "¡ð:Sub menu",
+    "ï¿½ï¿½:Sub menu",
 
     // MSG_MAIN_MENU_HELP_CHEAT
-    "¡ð:Select to manage cheats",
+    "ï¿½ï¿½:Select to manage cheats",
 
     // MSG_MAIN_MENU_HELP_7
-    "¡ð:File browser  " FONT_L_TRIGGER_GBK ":Shortcut key",
+    "ï¿½ï¿½:File browser  " FONT_L_TRIGGER_GBK ":Shortcut key",
 
     // MSG_MAIN_MENU_HELP_8
-    "¡ð:Reset game",
+    "ï¿½ï¿½:Reset game",
 
     // MSG_MAIN_MENU_HELP_9
-    "¡ð:Return to game",
+    "ï¿½ï¿½:Return to game",
 
     // MSG_MAIN_MENU_HELP_10
-    "¡ð:Sleep mode",
+    "ï¿½ï¿½:Sleep mode",
 
     // MSG_MAIN_MENU_HELP_11
-    "¡ð:Exit",
+    "ï¿½ï¿½:Exit",
 
     // MSG_OPTION_MENU_TITLE
     "Emulator options",
@@ -150,6 +150,18 @@
     // MSG_OPTION_MENU_13
     "Load backup ID  : %s",
 
+    // MSG_OPTION_MENU_14
+    "Scanline effect : %s",
+
+    // MSG_OPTION_MENU_15
+    "Vignette effect : %s",
+
+    // MSG_OPTION_MENU_16
+    "LCD ghosting    : %s",
+
+    // MSG_OPTION_MENU_17
+    "GBA border      : %s",
+
     // MSG_OPTION_MENU_HELP_0
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   all",
 
@@ -187,15 +199,27 @@
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
 
     // MSG_OPTION_MENU_HELP_DEFAULT
-    "¡ð:Restore default settings",
+    "ï¿½ï¿½:Restore default settings",
 
     // MSG_OPTION_MENU_HELP_11
-    "¡ð:Main menu",
+    "ï¿½ï¿½:Main menu",
 
     // MSG_OPTION_MENU_HELP_12
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   all",
 
     // MSG_OPTION_MENU_HELP_13
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
+    // MSG_OPTION_MENU_HELP_14
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
+    // MSG_OPTION_MENU_HELP_15
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
+    // MSG_OPTION_MENU_HELP_16
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
+    // MSG_OPTION_MENU_HELP_17
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
 
     // MSG_STATE_MENU_DATE_FMT_0
@@ -226,40 +250,40 @@
     "Back",
 
     // MSG_STATE_MENU_HELP_0
-    "¡ð:Execute  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select",
+    "ï¿½ï¿½:Execute  " FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select",
 
     // MSG_STATE_MENU_HELP_1
-    "¡ð:File browser",
+    "ï¿½ï¿½:File browser",
 
     // MSG_STATE_MENU_HELP_2
-    "¡ð:Main menu",
+    "ï¿½ï¿½:Main menu",
 
     // MSG_PAD_MENU_TITLE
     "Gamepad config",
 
     // MSG_PAD_MENU_0
-    "¡ü     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_1
-    "¡ý     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_2
-    "¡û     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_3
-    "¡ú     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_4
-    "¡ð     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_5
-    "¡Á     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_6
-    "¡õ     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_7
-    "¡÷     : %s",
+    "ï¿½ï¿½     : %s",
 
     // MSG_PAD_MENU_8
     FONT_L_TRIGGER_GBK "     : %s",
@@ -280,21 +304,21 @@
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select",
 
     // MSG_PAD_MENU_HELP_1
-    "¡ð:Main menu",
+    "ï¿½ï¿½:Main menu",
 
-    //PAD¤ÎÔO¶¨ ¥³¥ó¥Õ¥£¥°
+    //PADï¿½ï¿½ï¿½Oï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ¥ï¿½ï¿½ï¿½
 
     // MSG_PAD_MENU_CFG_0
-    "¡ü",
+    "ï¿½ï¿½",
 
     // MSG_PAD_MENU_CFG_1
-    "¡ý",
+    "ï¿½ï¿½",
 
     // MSG_PAD_MENU_CFG_2
-    "¡û",
+    "ï¿½ï¿½",
 
     // MSG_PAD_MENU_CFG_3
-    "¡ú",
+    "ï¿½ï¿½",
 
     // MSG_PAD_MENU_CFG_4
     "A",
@@ -348,16 +372,16 @@
     "Analog stick config",
 
     // MSG_A_PAD_MENU_0
-    "Analog ¡ü : %s",
+    "Analog ï¿½ï¿½ : %s",
 
     // MSG_A_PAD_MENU_1
-    "Analog ¡ý : %s",
+    "Analog ï¿½ï¿½ : %s",
 
     // MSG_A_PAD_MENU_2
-    "Analog ¡û : %s",
+    "Analog ï¿½ï¿½ : %s",
 
     // MSG_A_PAD_MENU_3
-    "Analog ¡ú : %s",
+    "Analog ï¿½ï¿½ : %s",
 
     // MSG_A_PAD_MENU_4
     "Enable analog input : %s",
@@ -375,7 +399,7 @@
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select",
 
     // MSG_A_PAD_MENU_HELP_2
-    "¡ð:Main menu",
+    "ï¿½ï¿½:Main menu",
 
     //MSG_CHEAT_MENU_TITLE,
     "Cheats options",
@@ -399,10 +423,10 @@
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Activate/deactivate",
 
     //MSG_CHEAT_MENU_HELP_1,
-    "¡ð:Cheat file browser  "FONT_L_TRIGGER_GBK ":Shortcut key",
+    "ï¿½ï¿½:Cheat file browser  "FONT_L_TRIGGER_GBK ":Shortcut key",
 
     //MSG_CHEAT_MENU_HELP_2,
-    "¡ð:Main menu",
+    "ï¿½ï¿½:Main menu",
 
     //MSG_CHEAT_MENU_HELP_3,
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Change page",
@@ -475,6 +499,30 @@
 
     // MSG_SCN_SCALED_USER
     "USER GU",
+
+    // MSG_SCANLINE_NONE
+    "NONE",
+
+    // MSG_SCANLINE_LIGHT
+    "LIGHT",
+
+    // MSG_SCANLINE_MED
+    "MED",
+
+    // MSG_SCANLINE_HEAVY
+    "HEAVY",
+
+    // MSG_GHOSTING_NONE
+    "NONE",
+
+    // MSG_GHOSTING_LIGHT
+    "LIGHT",
+
+    // MSG_GHOSTING_MED
+    "MED",
+
+    // MSG_GHOSTING_HEAVY
+    "HEAVY",
 
     // MSG_SS_DATE_FMT_0
     "%04d_%02d_%02d_%s%02d_%02d_%02d_%03d",

@@ -9,13 +9,13 @@ PSPSDK = ${shell psp-config --pspsdk-path}
 PREFIX = ${shell psp-config --psp-prefix}
 
 BUILD_PRX = 1
-ENCRYPT = 1
+ENCRYPT = 0
 
 PSP_FW_VERSION = 371
 PSP_LARGE_MEMORY = 1
 
 PSP_EBOOT_ICON = res/ICON0.png
-PSP_EBOOT_TITLE = TempGBA cc
+PSP_EBOOT_TITLE = pspboy
 
 EXTRA_TARGETS = EBOOT.PBP
 

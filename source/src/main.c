@@ -50,6 +50,10 @@ u32 option_clock_speed = PSP_CLOCK_333;
 
 u32 option_load_backup_id = 0;
 u32 option_color_correction = 0;
+u32 option_scanline_effect = EFFECT_SCANLINE_NONE;
+u32 option_vignette_effect = 0;
+u32 option_lcd_ghosting = EFFECT_GHOSTING_NONE;
+u32 option_border_effect = 0;
 
 char main_path[MAX_PATH];
 

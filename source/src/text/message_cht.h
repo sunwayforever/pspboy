@@ -1,3 +1,4 @@
+// -*- coding: gbk -*-
 /* encoding: GBK */
   {
     //MSG_TURBO
@@ -148,6 +149,17 @@
     "顏色修正: %s",
 
     // MSG_OPTION_MENU_13
+    // MSG_OPTION_MENU_14
+    "Scanline effect : %s",
+
+    // MSG_OPTION_MENU_15
+    "Vignette effect : %s",
+    // MSG_OPTION_MENU_16
+    "LCD ghosting    : %s",
+
+    // MSG_OPTION_MENU_17
+    "GBA border      : %s",
+
     "存檔類型: %s",
 
     // MSG_OPTION_MENU_HELP_0
@@ -190,6 +202,17 @@
     "○:恢復到模擬器初始設定",
 
     // MSG_OPTION_MENU_HELP_11
+    // MSG_OPTION_MENU_HELP_14
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
+    // MSG_OPTION_MENU_HELP_15
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+    // MSG_OPTION_MENU_HELP_16
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
+    // MSG_OPTION_MENU_HELP_17
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Select   emulator",
+
     "○:主菜單",
 
     // MSG_OPTION_MENU_HELP_12
@@ -474,6 +497,29 @@
     "150% SW",
 
     // MSG_SCN_SCALED_USER
+    // MSG_SCANLINE_NONE
+    "NONE",
+
+    // MSG_SCANLINE_LIGHT
+    "LIGHT",
+
+    // MSG_SCANLINE_MED
+    "MED",
+
+    // MSG_SCANLINE_HEAVY
+    "HEAVY",
+    // MSG_GHOSTING_NONE
+    "NONE",
+
+    // MSG_GHOSTING_LIGHT
+    "LIGHT",
+
+    // MSG_GHOSTING_MED
+    "MED",
+
+    // MSG_GHOSTING_HEAVY
+    "HEAVY",
+
     "指定 GU",
 
     // MSG_SS_DATE_FMT_0

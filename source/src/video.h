@@ -124,5 +124,10 @@ int draw_volume_status_null(int draw);
 void video_write_mem_savestate(SceUID savestate_file);
 void video_read_savestate(SceUID savestate_file);
 
+// Display effects
+void init_effects_overlay(void);
+void apply_effects_overlay(u32 dx, u32 dy, u32 dw, u32 dh);
+void clear_effects_overlay(void);
+void init_border_texture(void);
 
 #endif /* VIDEO_H */

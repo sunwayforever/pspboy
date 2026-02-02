@@ -21,7 +21,7 @@
 #include "common.h"
 
 #define GPSP_CONFIG_FILENAME  "tempgba.cfg"
-#define GPSP_CONFIG_NUM       (17 + 16) // options + game pad config
+#define GPSP_CONFIG_NUM       (21 + 16) // options + game pad config
 #define GPSP_GAME_CONFIG_NUM  (8 + 16)
 
 #define COLOR_BG            COLOR15( 3,  5,  8)
@@ -927,6 +927,22 @@ u32 menu(void)
     MSG[MSG_AUTO]
   };
 
+  const char *scanline_options[] =
+  {
+    MSG[MSG_SCANLINE_NONE],
+    MSG[MSG_SCANLINE_LIGHT],
+    MSG[MSG_SCANLINE_MED],
+    MSG[MSG_SCANLINE_HEAVY]
+  };
+
+  const char *ghosting_options[] =
+  {
+    MSG[MSG_GHOSTING_NONE],
+    MSG[MSG_GHOSTING_LIGHT],
+    MSG[MSG_GHOSTING_MED],
+    MSG[MSG_GHOSTING_HEAVY]
+  };
+
   const char *sound_volume_options[] =
   {
     "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"
@@ -1002,6 +1018,7 @@ u32 menu(void)
   auto void gamepak_file_none(void);
   auto void gamepak_file_reopen(void);
   auto void on_change_cc(void);
+  auto void on_change_effects(void);
 
   void menu_init(void)
   {
@@ -1443,6 +1460,12 @@ u32 menu(void)
       current_screen = copy_screen(current_screen);
   }
 
+  void on_change_effects(void)
+  {
+      init_effects_overlay();
+      init_border_texture();
+  }
+
   // Marker for help information, don't go past this mark (except \n)------*
   MenuOptionType emulator_options[] =
   {
@@ -1472,11 +1495,19 @@ u32 menu(void)
 
     STRING_SELECTION_OPTION(NULL, MSG[MSG_OPTION_MENU_13], backup_id_options, &option_load_backup_id, 2, MSG_OPTION_MENU_HELP_13, 13),
 
-    STRING_SELECTION_ACTION_OPTION(menu_exit, NULL, MSG[MSG_OPTION_MENU_10], language_option, &option_language, 4, MSG_OPTION_MENU_HELP_10, 15),
+    STRING_SELECTION_ACTION_OPTION(on_change_effects, NULL, MSG[MSG_OPTION_MENU_14], scanline_options, &option_scanline_effect, 4, MSG_OPTION_MENU_HELP_14, 14),
 
-    ACTION_OPTION(menu_default, NULL, MSG[MSG_OPTION_MENU_DEFAULT], MSG_OPTION_MENU_HELP_DEFAULT, 16),
+    STRING_SELECTION_ACTION_OPTION(on_change_effects, NULL, MSG[MSG_OPTION_MENU_15], on_off_options, &option_vignette_effect, 2, MSG_OPTION_MENU_HELP_15, 15),
 
-    ACTION_SUBMENU_OPTION(NULL, menu_init, MSG[MSG_OPTION_MENU_11], MSG_OPTION_MENU_HELP_11, 17)
+    STRING_SELECTION_ACTION_OPTION(on_change_effects, NULL, MSG[MSG_OPTION_MENU_16], ghosting_options, &option_lcd_ghosting, 4, MSG_OPTION_MENU_HELP_16, 18),
+
+    STRING_SELECTION_ACTION_OPTION(on_change_effects, NULL, MSG[MSG_OPTION_MENU_17], on_off_options, &option_border_effect, 2, MSG_OPTION_MENU_HELP_17, 19),
+
+    STRING_SELECTION_ACTION_OPTION(menu_exit, NULL, MSG[MSG_OPTION_MENU_10], language_option, &option_language, 4, MSG_OPTION_MENU_HELP_10, 20),
+
+    ACTION_OPTION(menu_default, NULL, MSG[MSG_OPTION_MENU_DEFAULT], MSG_OPTION_MENU_HELP_DEFAULT, 21),
+
+    ACTION_SUBMENU_OPTION(NULL, menu_init, MSG[MSG_OPTION_MENU_11], MSG_OPTION_MENU_HELP_11, 18)
   };
 
   MAKE_MENU(emulator, submenu_emulator, NULL);
@@ -2031,10 +2062,14 @@ s32 save_config_file(void)
     file_options[14] = option_language;
     file_options[15] = option_load_backup_id;
     file_options[16] = option_color_correction;
+    file_options[17] = option_scanline_effect;
+    file_options[18] = option_vignette_effect;
+    file_options[19] = option_lcd_ghosting;
+    file_options[20] = option_border_effect;
 
     for (i = 0; i < 16; i++)
     {
-      file_options[17 + i] = gamepad_config_map[i];
+      file_options[21 + i] = gamepad_config_map[i];
     }
 
     FILE_WRITE_ARRAY(config_file, file_options);
@@ -2159,10 +2194,14 @@ s32 load_config_file(void)
       option_language       = file_options[14] % 4;
       option_load_backup_id = file_options[15] % 2;
       option_color_correction = file_options[16] % 2;
+      option_scanline_effect = file_options[17] % 4;
+      option_vignette_effect = file_options[18] % 2;
+      option_lcd_ghosting = file_options[19] % 4;
+      option_border_effect = file_options[20] % 2;
 
       for (i = 0; i < 16; i++)
       {
-        gamepad_config_map[i] = file_options[17 + i] % (BUTTON_ID_NONE + 1);
+        gamepad_config_map[i] = file_options[21 + i] % (BUTTON_ID_NONE + 1);
 
         if (gamepad_config_map[i] == BUTTON_ID_MENU)
           menu_button = i;
@@ -2190,6 +2229,10 @@ s32 load_config_file(void)
   option_analog_sensitivity = 4;
   option_load_backup_id = 0;
   option_color_correction = 0;
+  option_scanline_effect = EFFECT_SCANLINE_NONE;
+  option_vignette_effect = 0;
+  option_lcd_ghosting = EFFECT_GHOSTING_NONE;
+  option_border_effect = 0;
 
   int id_language;
   sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_LANGUAGE, &id_language);

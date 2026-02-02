@@ -47,6 +47,16 @@
 #define CONFIRMATION_CONT  1
 #define CONFIRMATION_QUIT  2
 
+// display effect types
+#define EFFECT_SCANLINE_NONE  0
+#define EFFECT_SCANLINE_LIGHT 1
+#define EFFECT_SCANLINE_MED   2
+#define EFFECT_SCANLINE_HEAVY 3
+
+#define EFFECT_GHOSTING_NONE  0
+#define EFFECT_GHOSTING_LIGHT 1
+#define EFFECT_GHOSTING_MED   2
+#define EFFECT_GHOSTING_HEAVY 3
 
 extern u32 option_screen_scale;
 extern u32 option_screen_mag;
@@ -66,6 +76,10 @@ extern u32 option_clock_speed;
 
 extern u32 option_load_backup_id;
 extern u32 option_color_correction;
+extern u32 option_scanline_effect;
+extern u32 option_vignette_effect;
+extern u32 option_lcd_ghosting;
+extern u32 option_border_effect;
 
 extern char main_path[MAX_PATH];
 

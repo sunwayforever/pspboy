@@ -107,6 +107,18 @@ static void cc_screen_texture(void);
 static void bitbilt_gu(void);
 static void bitbilt_sw(void);
 
+// Display effects overlay
+static u16 *effects_overlay_texture = NULL;
+static u32 effects_texture_width = 512;
+static u32 effects_texture_height = 512;
+
+// LCD ghosting effect
+static u16 *prev_frame_buffer = NULL;
+static u32 prev_frame_size = 0;
+
+// Border effect
+static u16 *border_texture = NULL;
+
 static void *psp_vram_addr(void *frame, u32 x, u32 y); // un-cached
 
 static void load_volume_icon(int devkit_version);
@@ -3235,6 +3247,7 @@ void init_video(int devkit_version)
 
 void video_term(void)
 {
+  clear_effects_overlay();
   sceGuDisplay(GU_FALSE);
   sceGuTerm();
 }
@@ -3339,16 +3352,464 @@ static void cc_screen_texture(void)
   }
 }
 
+/*-----------------------------------------------------------------------------
+  Display Effects Overlay System
+-----------------------------------------------------------------------------*/
+
+void init_effects_overlay(void)
+{
+  u32 x, y;
+  u16 *p_dest;
+  u32 scanline_intensity = 0;
+  u32 use_vignette = 0;
+
+  // Check if effects are enabled
+  if ((option_scanline_effect == EFFECT_SCANLINE_NONE) && (option_vignette_effect == 0))
+  {
+    // Only free the overlay texture, not other effects' buffers
+    if (effects_overlay_texture != NULL)
+    {
+      free(effects_overlay_texture);
+      effects_overlay_texture = NULL;
+    }
+    return;
+  }
+
+  // Allocate texture if needed
+  if (effects_overlay_texture == NULL)
+  {
+    effects_overlay_texture = (u16 *)safe_malloc(effects_texture_width * effects_texture_height * 2);
+  }
+
+  if (effects_overlay_texture == NULL)
+    return;
+
+  // Set scanline intensity (darker = more visible scanlines)
+  switch (option_scanline_effect)
+  {
+    case EFFECT_SCANLINE_LIGHT:
+      scanline_intensity = 8;  // Subtle darkening
+      break;
+    case EFFECT_SCANLINE_MED:
+      scanline_intensity = 16; // Medium darkening
+      break;
+    case EFFECT_SCANLINE_HEAVY:
+      scanline_intensity = 24; // Heavy darkening
+      break;
+    default:
+      scanline_intensity = 0;
+      break;
+  }
+
+  use_vignette = option_vignette_effect;
+
+  // Generate the overlay texture
+  for (y = 0; y < PSP_SCREEN_HEIGHT; y++)
+  {
+    p_dest = effects_overlay_texture + (y * effects_texture_width);
+
+    for (x = 0; x < PSP_SCREEN_WIDTH; x++)
+    {
+      u16 pixel = 0;
+      u8 alpha = 0;
+
+      // Scanline effect (horizontal dark lines)
+      if (scanline_intensity > 0)
+      {
+        if ((y & 1) == 0)  // Even lines get darkened
+        {
+          alpha = scanline_intensity;
+        }
+      }
+
+      // Vignette effect (darkened corners)
+      if (use_vignette)
+      {
+        // Calculate distance from center
+        float dx = (float)x - (PSP_SCREEN_WIDTH / 2.0f);
+        float dy = (float)y - (PSP_SCREEN_HEIGHT / 2.0f);
+        float dist = sqrtf(dx * dx + dy * dy);
+        float max_dist = sqrtf((PSP_SCREEN_WIDTH / 2.0f) * (PSP_SCREEN_WIDTH / 2.0f) +
+                              (PSP_SCREEN_HEIGHT / 2.0f) * (PSP_SCREEN_HEIGHT / 2.0f));
+
+        // Vignette strength increases with distance from center
+        u32 vignette_alpha = (u32)((dist / max_dist) * 32.0f);
+        if (vignette_alpha > 48) vignette_alpha = 48;
+
+        alpha += vignette_alpha;
+        if (alpha > 63) alpha = 63;
+      }
+
+      // Store as 5-bit alpha in color format (R5G5B5A1 format for PSP GU)
+      // Use a dark color with alpha
+      if (alpha > 0)
+      {
+        pixel = (1 << 15) | ((alpha >> 1) << 10) | ((alpha >> 1) << 5) | (alpha >> 1);
+      }
+      else
+      {
+        pixel = 0;  // Transparent (alpha = 0)
+      }
+
+      *p_dest++ = pixel;
+    }
+  }
+
+  sceKernelDcacheWritebackAll();
+}
+
+void apply_effects_overlay(u32 dx, u32 dy, u32 dw, u32 dh)
+{
+  Vertex *vertices;
+
+  // Skip if no effects enabled
+  if ((option_scanline_effect == EFFECT_SCANLINE_NONE) && (option_vignette_effect == 0))
+    return;
+
+  if (effects_overlay_texture == NULL)
+    return;
+
+  sceGuEnable(GU_BLEND);
+  sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+
+  sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
+  sceGuTexMode(GU_PSM_5551, 0, 0, GU_FALSE);
+  sceGuTexImage(0, effects_texture_width, effects_texture_height, effects_texture_width, effects_overlay_texture);
+  sceGuTexFlush();
+
+  vertices = (Vertex *)sceGuGetMemory(2 * sizeof(Vertex));
+
+  if (vertices != NULL)
+  {
+    vertices[0].u = 0;
+    vertices[0].v = 0;
+    vertices[0].x = dx;
+    vertices[0].y = dy;
+    vertices[0].z = 0;
+
+    vertices[1].u = PSP_SCREEN_WIDTH;
+    vertices[1].v = PSP_SCREEN_HEIGHT;
+    vertices[1].x = dx + dw;
+    vertices[1].y = dy + dh;
+    vertices[1].z = 0;
+
+    sceGuDrawArray(GU_SPRITES, GU_TEXTURE_16BIT | GU_VERTEX_16BIT | GU_TRANSFORM_2D, 2, 0, vertices);
+  }
+
+  sceGuDisable(GU_BLEND);
+  sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
+}
+
+void clear_effects_overlay(void)
+{
+  if (effects_overlay_texture != NULL)
+  {
+    free(effects_overlay_texture);
+    effects_overlay_texture = NULL;
+  }
+
+  if (prev_frame_buffer != NULL)
+  {
+    free(prev_frame_buffer);
+    prev_frame_buffer = NULL;
+  }
+
+  if (border_texture != NULL)
+  {
+    free(border_texture);
+    border_texture = NULL;
+  }
+}
+
+/*-----------------------------------------------------------------------------
+  LCD Ghosting Effect
+  Simulates the slow response time of original GBA LCD screen
+-----------------------------------------------------------------------------*/
+
+static void apply_lcd_ghosting(void)
+{
+  u32 x, y;
+  u16 *p_src, *p_prev;
+  u32 ghosting_intensity;
+
+  if (option_lcd_ghosting == EFFECT_GHOSTING_NONE)
+    return;
+
+  // Allocate previous frame buffer if needed
+  if (prev_frame_buffer == NULL)
+  {
+    prev_frame_size = GBA_SCREEN_WIDTH * GBA_SCREEN_HEIGHT * 2;
+    prev_frame_buffer = (u16 *)safe_malloc(prev_frame_size);
+    if (prev_frame_buffer == NULL)
+      return;
+    memset(prev_frame_buffer, 0, prev_frame_size);
+  }
+
+  // Set ghosting intensity (blend factor)
+  switch (option_lcd_ghosting)
+  {
+    case EFFECT_GHOSTING_LIGHT:
+      ghosting_intensity = 24;  // ~12% previous frame
+      break;
+    case EFFECT_GHOSTING_MED:
+      ghosting_intensity = 48;  // ~24% previous frame
+      break;
+    case EFFECT_GHOSTING_HEAVY:
+      ghosting_intensity = 80;  // ~40% previous frame
+      break;
+    default:
+      ghosting_intensity = 0;
+      break;
+  }
+
+  // Apply ghosting by blending previous frame into current frame
+  p_src = screen_texture;
+  p_prev = prev_frame_buffer;
+
+  for (y = 0; y < GBA_SCREEN_HEIGHT; y++)
+  {
+    for (x = 0; x < GBA_SCREEN_WIDTH; x++)
+    {
+      u16 current = p_src[x];
+      u16 prev = p_prev[x];
+
+      // Blend previous frame with current frame
+      u32 r = (COL15_GET_R5(current) * (256 - ghosting_intensity) + COL15_GET_R5(prev) * ghosting_intensity) >> 8;
+      u32 g = (COL15_GET_G5(current) * (256 - ghosting_intensity) + COL15_GET_G5(prev) * ghosting_intensity) >> 8;
+      u32 b = (COL15_GET_B5(current) * (256 - ghosting_intensity) + COL15_GET_B5(prev) * ghosting_intensity) >> 8;
+
+      if (r > 31) r = 31;
+      if (g > 31) g = 31;
+      if (b > 31) b = 31;
+
+      p_src[x] = COLOR15(r, g, b);
+    }
+
+    // Copy current line to previous frame buffer for next time
+    memcpy(p_prev, p_src, GBA_SCREEN_WIDTH * 2);
+
+    p_src += GBA_LINE_SIZE;
+    p_prev += GBA_SCREEN_WIDTH;
+  }
+}
+
+/*-----------------------------------------------------------------------------
+  GBA Border Effect
+  Draws a decorative border around the game screen
+-----------------------------------------------------------------------------*/
+
+void init_border_texture(void)
+{
+  u32 x, y;
+  u16 *p_dest;
+
+  if (option_border_effect == 0)
+  {
+    if (border_texture != NULL)
+    {
+      free(border_texture);
+      border_texture = NULL;
+    }
+    return;
+  }
+
+  // Allocate border texture (full PSP screen size)
+  if (border_texture == NULL)
+  {
+    border_texture = (u16 *)safe_malloc(PSP_FRAME_SIZE);
+    if (border_texture == NULL)
+      return;
+  }
+
+  p_dest = border_texture;
+
+  // Fill with dark gray background (GBA shell color)
+  for (y = 0; y < PSP_SCREEN_HEIGHT; y++)
+  {
+    for (x = 0; x < PSP_LINE_SIZE; x++)
+    {
+      p_dest[x] = COLOR15(10, 12, 14);  // Dark gray
+    }
+    p_dest += PSP_LINE_SIZE;
+  }
+
+  // Draw speaker grille pattern on bottom border
+  p_dest = border_texture + (PSP_LINE_SIZE * (PSP_SCREEN_HEIGHT - 40));
+
+  for (y = 0; y < 30; y++)
+  {
+    for (x = 180; x < 300; x += 6)
+    {
+      if (x + 2 < PSP_SCREEN_WIDTH)
+      {
+        border_texture[(PSP_SCREEN_HEIGHT - 40 + y) * PSP_LINE_SIZE + x] = COLOR15(6, 8, 10);
+        border_texture[(PSP_SCREEN_HEIGHT - 40 + y) * PSP_LINE_SIZE + x + 1] = COLOR15(6, 8, 10);
+      }
+    }
+  }
+
+  // Draw decorative border lines
+  // Top edge highlight
+  p_dest = border_texture + PSP_LINE_SIZE * 2;
+  for (x = 0; x < PSP_SCREEN_WIDTH; x++)
+  {
+    p_dest[x] = COLOR15(18, 20, 22);  // Lighter highlight
+  }
+
+  // Bottom edge shadow
+  p_dest = border_texture + PSP_LINE_SIZE * (PSP_SCREEN_HEIGHT - 3);
+  for (x = 0; x < PSP_SCREEN_WIDTH; x++)
+  {
+    p_dest[x] = COLOR15(6, 7, 8);  // Darker shadow
+  }
+
+  sceKernelDcacheWritebackAll();
+}
+
+static void apply_border_overlay(u32 dx, u32 dy, u32 dw, u32 dh)
+{
+  Vertex *vertices;
+
+  if (option_border_effect == 0)
+    return;
+
+  if (border_texture == NULL)
+    return;
+
+  sceGuEnable(GU_TEXTURE_2D);
+  sceGuTexMode(GU_PSM_5551, 0, 0, GU_FALSE);
+  sceGuTexImage(0, 512, 512, PSP_LINE_SIZE, border_texture);
+  sceGuTexFilter(GU_LINEAR, GU_LINEAR);
+  sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
+  sceGuTexWrap(GU_CLAMP, GU_CLAMP);
+
+  sceGuEnable(GU_BLEND);
+  sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+
+  vertices = (Vertex *)sceGuGetMemory(8 * sizeof(Vertex));
+
+  if (vertices != NULL)
+  {
+    // Top border
+    vertices[0].u = 0;
+    vertices[0].v = 0;
+    vertices[0].x = 0;
+    vertices[0].y = 0;
+    vertices[0].z = 0;
+
+    vertices[1].u = PSP_SCREEN_WIDTH;
+    vertices[1].v = dy;
+    vertices[1].x = PSP_SCREEN_WIDTH;
+    vertices[1].y = dy;
+    vertices[1].z = 0;
+
+    // Bottom border
+    vertices[2].u = 0;
+    vertices[2].v = dy + dh;
+    vertices[2].x = 0;
+    vertices[2].y = dy + dh;
+    vertices[2].z = 0;
+
+    vertices[3].u = PSP_SCREEN_WIDTH;
+    vertices[3].v = PSP_SCREEN_HEIGHT;
+    vertices[3].x = PSP_SCREEN_WIDTH;
+    vertices[3].y = PSP_SCREEN_HEIGHT;
+    vertices[3].z = 0;
+
+    // Left border
+    vertices[4].u = 0;
+    vertices[4].v = dy;
+    vertices[4].x = 0;
+    vertices[4].y = dy;
+    vertices[4].z = 0;
+
+    vertices[5].u = dx;
+    vertices[5].v = dy + dh;
+    vertices[5].x = dx;
+    vertices[5].y = dy + dh;
+    vertices[5].z = 0;
+
+    // Right border
+    vertices[6].u = dx + dw;
+    vertices[6].v = dy;
+    vertices[6].x = dx + dw;
+    vertices[6].y = dy;
+    vertices[6].z = 0;
+
+    vertices[7].u = PSP_SCREEN_WIDTH;
+    vertices[7].v = dy + dh;
+    vertices[7].x = PSP_SCREEN_WIDTH;
+    vertices[7].y = dy + dh;
+    vertices[7].z = 0;
+
+    sceGuDrawArray(GU_SPRITES, GU_TEXTURE_16BIT | GU_VERTEX_16BIT | GU_TRANSFORM_2D, 8, 0, vertices);
+  }
+
+  sceGuDisable(GU_BLEND);
+  sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
+}
+
 static void bitbilt_gu(void)
 {
+  u32 dx, dy, dw, dh;
+  float mag;
+
   if (option_color_correction != 0)
     cc_screen_texture();
+
+  // Apply LCD ghosting effect (blends with previous frame)
+  apply_lcd_ghosting();
 
   sceKernelDcacheWritebackAll();
 
   sceGuStart(GU_DIRECT, display_list);
 
   sceGuCallList(display_list_0);
+
+  // Calculate display position based on current scaling
+  switch (option_screen_scale)
+  {
+    case SCALED_NONE:
+      mag = 1.0;
+      break;
+    case SCALED_X15_GU:
+      mag = 1.5;
+      break;
+    case SCALED_USER:
+      mag = option_screen_mag / 100.0;
+      break;
+    default:
+      mag = 1.5;
+      break;
+  }
+
+  dw = GBA_SCREEN_WIDTH  * mag;
+  dh = GBA_SCREEN_HEIGHT * mag;
+  dx = (PSP_SCREEN_WIDTH  - dw) >> 1;
+  dy = (PSP_SCREEN_HEIGHT - dh) >> 1;
+
+  // Apply effects overlay if enabled
+  if ((option_scanline_effect != EFFECT_SCANLINE_NONE) || (option_vignette_effect != 0))
+  {
+    sceGuFinish();
+    sceGuSync(0, GU_SYNC_FINISH);
+
+    // Second pass: apply effects overlay
+    sceGuStart(GU_DIRECT, display_list);
+    apply_effects_overlay(dx, dy, dw, dh);
+  }
+
+  // Apply border overlay if enabled
+  if (option_border_effect != 0)
+  {
+    if ((option_scanline_effect == EFFECT_SCANLINE_NONE) && (option_vignette_effect == 0))
+    {
+      sceGuFinish();
+      sceGuSync(0, GU_SYNC_FINISH);
+      sceGuStart(GU_DIRECT, display_list);
+    }
+    apply_border_overlay(dx, dy, dw, dh);
+  }
 
   sceGuFinish();
   sceGuSync(0, GU_SYNC_FINISH);
@@ -3471,6 +3932,9 @@ void video_resolution_small(void)
 
   sceGuFinish();
   sceGuSync(0, GU_SYNC_FINISH);
+
+  init_effects_overlay();
+  init_border_texture();
 }
 
 static void set_gba_resolution(void)

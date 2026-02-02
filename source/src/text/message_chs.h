@@ -1,3 +1,4 @@
+// -*- coding: gbk -*-
 /* encoding: GBK */
   {
     //MSG_TURBO
@@ -149,6 +150,17 @@
 
     // MSG_OPTION_MENU_13
     "´æµµÀàÐÍ: %s",
+    // MSG_OPTION_MENU_14
+    "É¨ÃèÏß: %s",
+
+    // MSG_OPTION_MENU_15
+    "°µ½Ç: %s",
+    // MSG_OPTION_MENU_16
+    "LCD ²ÐÓ°: %s",
+
+    // MSG_OPTION_MENU_17
+    "GBA ±ß¿ò: %s",
+
 
     // MSG_OPTION_MENU_HELP_0
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Ñ¡Ôñ   ÓÎÏ·/Ä£ÄâÆ÷ÅäÖÃ",
@@ -191,6 +203,18 @@
 
     // MSG_OPTION_MENU_HELP_11
     "¡ð:Ö÷²Ëµ¥",
+
+    // MSG_OPTION_MENU_HELP_16
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Ñ¡ï¿½ï¿½   Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",
+
+    // MSG_OPTION_MENU_HELP_17
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Ñ¡ï¿½ï¿½   Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",
+    // MSG_OPTION_MENU_HELP_14
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Ñ¡Ôñ   Ä£ÄâÆ÷ÅäÖÃ",
+
+    // MSG_OPTION_MENU_HELP_15
+    FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Ñ¡Ôñ   Ä£ÄâÆ÷ÅäÖÃ",
+
 
     // MSG_OPTION_MENU_HELP_12
     FONT_CURSOR_LEFT_GBK FONT_CURSOR_RIGHT_GBK ":Ñ¡Ôñ   ÓÎÏ·/Ä£ÄâÆ÷ÅäÖÃ",
@@ -474,6 +498,29 @@
     "150% SW",
 
     // MSG_SCN_SCALED_USER
+    // MSG_SCANLINE_NONE
+    "ï¿½ï¿½",
+
+    // MSG_SCANLINE_LIGHT
+    "ï¿½ï¿½",
+
+    // MSG_SCANLINE_MED
+    "ï¿½ï¿½",
+
+    // MSG_SCANLINE_HEAVY
+    "Ç¿",
+    // MSG_GHOSTING_NONE
+    "ï¿½ï¿½",
+
+    // MSG_GHOSTING_LIGHT
+    "ï¿½ï¿½",
+
+    // MSG_GHOSTING_MED
+    "ï¿½ï¿½",
+
+    // MSG_GHOSTING_HEAVY
+    "Ç§",
+
     "Ö¸¶¨ GU",
 
     // MSG_SS_DATE_FMT_0
