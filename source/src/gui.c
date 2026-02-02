@@ -286,7 +286,7 @@ static int sort_function(const void *dest_str_ptr, const void *src_str_ptr);
 static s32 save_game_config_file(void);
 
 static void update_status_string(char *time_str, char *batt_str, u16 *color_batt);
-static void get_timestamp_string(char *buffer, u16 msg_id, pspTime *msg_time, int day_of_week);
+static void get_timestamp_string(char *buffer, u16 msg_id, ScePspDateTime *msg_time, int day_of_week);
 
 static void get_savestate_info(char *filename, u16 *snapshot, char *timestamp);
 static void get_savestate_filename(u32 slot, char *name_buffer);
@@ -772,7 +772,7 @@ static void get_savestate_info(char *filename, u16 *snapshot, char *timestamp)
     u64 savestate_tick_utc;
     u64 savestate_tick_local;
 
-    pspTime savestate_time = { 0 };
+    ScePspDateTime savestate_time = { 0 };
 
     if (snapshot != NULL)
       FILE_READ(savestate_file, snapshot, GBA_SCREEN_SIZE);
@@ -1406,7 +1406,7 @@ u32 menu(void)
     {
       get_savestate_filename(i, filename_buffer);
       get_savestate_info(filename_buffer, NULL, line_buffer);
-      sprintf(savestate_timestamps[i], "%d: %s", i, line_buffer);
+      sprintf(savestate_timestamps[i], "%lu: %s", i, line_buffer);
     }
   }
 
@@ -1854,7 +1854,7 @@ u32 menu(void)
 
 static void update_status_string(char *time_str, char *batt_str, u16 *color_batt)
 {
-  pspTime current_time = { 0 };
+  ScePspDateTime current_time = { 0 };
 
   u32 i = 0;
   int batt_life_per;
@@ -1892,16 +1892,20 @@ static void update_status_string(char *time_str, char *batt_str, u16 *color_batt
 
   if (scePowerIsPowerOnline() == 1)
   {
-    sprintf(batt_str, "%s%s", batt_str, MSG[MSG_CHARGE]);
+    strcat(batt_str, MSG[MSG_CHARGE]);
   }
   else
   {
     batt_life_time = scePowerGetBatteryLifeTime();
 
     if (batt_life_time < 0)
-      sprintf(batt_str, "%s%s", batt_str, "[--:--]");
+      strcat(batt_str, "[--:--]");
     else
-      sprintf(batt_str, "%s[%2d:%02d]", batt_str, (batt_life_time / 60) % 100, batt_life_time % 60);
+    {
+      char time_buf[16];
+      sprintf(time_buf, "[%2d:%02d]", (batt_life_time / 60) % 100, batt_life_time % 60);
+      strcat(batt_str, time_buf);
+    }
   }
 
   if (scePowerIsBatteryCharging() == 1)
@@ -1917,7 +1921,7 @@ static void update_status_string(char *time_str, char *batt_str, u16 *color_batt
   }
 }
 
-static void get_timestamp_string(char *buffer, u16 msg_id, pspTime *msg_time, int day_of_week)
+static void get_timestamp_string(char *buffer, u16 msg_id, ScePspDateTime *msg_time, int day_of_week)
 {
   const char *week_str[] =
   {
@@ -1927,13 +1931,13 @@ static void get_timestamp_string(char *buffer, u16 msg_id, pspTime *msg_time, in
   switch (date_format)
   {
     case 0: // DATE_FORMAT_YYYYMMDD
-      sprintf(buffer, MSG[msg_id + 0], msg_time->year, msg_time->month, msg_time->day, week_str[day_of_week], msg_time->hour, msg_time->minutes, msg_time->seconds, (msg_time->microseconds / 1000));
+      sprintf(buffer, MSG[msg_id + 0], msg_time->year, msg_time->month, msg_time->day, week_str[day_of_week], msg_time->hour, msg_time->minute, msg_time->second, (msg_time->microsecond / 1000));
       break;
     case 1: // DATE_FORMAT_MMDDYYYY
-      sprintf(buffer, MSG[msg_id + 1], msg_time->month, msg_time->day, msg_time->year, week_str[day_of_week], msg_time->hour, msg_time->minutes, msg_time->seconds, (msg_time->microseconds / 1000));
+      sprintf(buffer, MSG[msg_id + 1], msg_time->month, msg_time->day, msg_time->year, week_str[day_of_week], msg_time->hour, msg_time->minute, msg_time->second, (msg_time->microsecond / 1000));
       break;
     case 2: // DATE_FORMAT_DDMMYYYY
-      sprintf(buffer, MSG[msg_id + 1], msg_time->day, msg_time->month, msg_time->year, week_str[day_of_week], msg_time->hour, msg_time->minutes, msg_time->seconds, (msg_time->microseconds / 1000));
+      sprintf(buffer, MSG[msg_id + 1], msg_time->day, msg_time->month, msg_time->year, week_str[day_of_week], msg_time->hour, msg_time->minute, msg_time->second, (msg_time->microsecond / 1000));
       break;
   }
 }
@@ -2309,7 +2313,8 @@ s32 load_dir_cfg(char *file_name)
     if (str_line > 7)
     {
       sprintf(str_buf, MSG[MSG_ERR_SET_DIR_2], main_path);
-      sprintf(str_buf, "%s\n\n%s", str_buf, MSG[MSG_ERR_CONT]);
+      strcat(str_buf, "\n\n");
+      strcat(str_buf, MSG[MSG_ERR_CONT]);
 
       str_line += FONTHEIGHT;
       print_string(str_buf, 7, str_line, COLOR15_WHITE, COLOR15_BLACK);
@@ -2339,7 +2344,7 @@ static void get_snapshot_filename(char *name, const char *ext)
   char filename[MAX_FILE];
   char timestamp[80];
 
-  pspTime current_time = { 0 };
+  ScePspDateTime current_time = { 0 };
 
   change_ext(gamepak_filename, filename, "_");
 
@@ -2402,4 +2407,3 @@ static void save_bmp(const char *path, u16 *screen_image)
 
   free(bmp_data);
 }
-

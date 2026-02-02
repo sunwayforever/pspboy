@@ -54,6 +54,7 @@ u32 option_color_correction = 0;
 char main_path[MAX_PATH];
 
 int date_format = 0;
+int (*__draw_volume_status)(int draw);
 u32 enable_home_menu = 1;
 
 u32 sleep_flag = 0;
@@ -550,7 +551,7 @@ static void synchronize(void)
     if (psp_fps_debug != 0)
     {
       char print_buffer[16];
-      sprintf(print_buffer, "%02d(%02d)", fps, frames_drawn);
+      sprintf(print_buffer, "%02ld(%02ld)", fps, frames_drawn);
 //    sprintf(print_buffer, "%02d(%02d)", fps % 100, frames_drawn);
       print_string(print_buffer, 0, 0, COLOR15_WHITE, COLOR15_BLACK);
     }

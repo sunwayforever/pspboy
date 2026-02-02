@@ -43,7 +43,8 @@ CFLAGS = \
  -march=allegrex -mfp32 -mgp32 -mlong32 -mabi=eabi \
  -fomit-frame-pointer -fstrict-aliasing \
  -falign-functions=32 -falign-loops -falign-labels -falign-jumps \
- -Wall -Wundef -Wpointer-arith -Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Wsign-compare -Werror \
+ -Wall -Wundef -Wpointer-arith -Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Wsign-compare \
+ -Wno-old-style-definition -Wno-format-overflow -Wno-format-truncation -Wno-restrict \
  -DZLIB_CONST
 
 ASFLAGS = ${CFLAGS}
@@ -54,4 +55,3 @@ LIBDIR = SDK/lib
 LIBS = src/libpower/libpsppower.a -lpspgu -lpsprtc -lpspaudio -lpspkubridge
 
 include ${PSPSDK}/lib/build.mak
-

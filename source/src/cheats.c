@@ -429,4 +429,3 @@ void process_cheats(void)
     }
   }
 }
-

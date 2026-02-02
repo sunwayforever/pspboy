@@ -1,0 +1,5 @@
+*.o
+PARAM.SFO
+EBOOT.PBP
+TempGBA.elf
+TempGBA.prx

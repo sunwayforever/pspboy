@@ -29,14 +29,14 @@ void ExceptionHandler(PspDebugRegBlock *regs)
 {
     int i;
     SceCtrlData pad;
-    
+
     pspDebugScreenInit();
     pspDebugScreenSetBackColor(0x00FF0000);
     pspDebugScreenSetTextColor(0xFFFFFFFF);
     pspDebugScreenClear();
-    
+
     pspDebugScreenPrintf("Your PSP has just crashed!\n\n");
-    
+
     pspDebugScreenPrintf("Exception details:\n\n");
     pspDebugScreenPrintf("Exception - %s\n", codeTxt[(regs->cause >> 2) & 31]);
     pspDebugScreenPrintf("EPC       - %08X / %s.text + %08X\n", (int)regs->epc, module_info.modname, (unsigned int)(regs->epc-(int)&_ftext));
@@ -44,11 +44,11 @@ void ExceptionHandler(PspDebugRegBlock *regs)
     pspDebugScreenPrintf("Status    - %08X\n", (int)regs->status);
     pspDebugScreenPrintf("BadVAddr  - %08X\n\n", (int)regs->badvaddr);
     for (i=0; i<32; i+=4) pspDebugScreenPrintf("%s:%08X %s:%08X %s:%08X %s:%08X\n", regName[i], (int)regs->r[i], regName[i+1], (int)regs->r[i+1], regName[i+2], (int)regs->r[i+2], regName[i+3], (int)regs->r[i+3]);
-    
+
     sceKernelDelayThread(1000000);
     pspDebugScreenPrintf("\n\nPress X to dump information on file exception.log and quit");
     pspDebugScreenPrintf("\nPress O to quit");
-    
+
     for (;;) {
         sceCtrlReadBufferPositive(&pad, 1);
         if (pad.Buttons & PSP_CTRL_CROSS) {
@@ -89,13 +89,13 @@ void initExceptionHandler(void)
 {
    SceKernelLMOption option = { 0 };
    int args[2], fd, modid;
-   
+
    option.size = sizeof(option);
    option.mpidtext = PSP_MEMORY_PARTITION_KERNEL;
    option.mpiddata = PSP_MEMORY_PARTITION_KERNEL;
    option.position = 0;
    option.access = 1;
-   
+
    if ((modid = kuKernelLoadModule("exception.prx", 0, &option)) >= 0)
    {
       args[0] = (int)ExceptionHandler;
@@ -103,4 +103,3 @@ void initExceptionHandler(void)
       sceKernelStartModule(modid, 8, args, &fd, NULL);
    }
 }
-

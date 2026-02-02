@@ -52,6 +52,7 @@ static u16 *screen_texture = (u16 *)(0x4000000 + (PSP_FRAME_SIZE * 2));
 
 void *disp_frame;
 void *draw_frame;
+void (*update_screen)(void);
 
 
 typedef struct
